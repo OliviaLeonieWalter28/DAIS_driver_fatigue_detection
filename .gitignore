@@ -1,0 +1,19 @@
+# ignored folders
+logs/
+.vscode/
+home/
+venv/
+results/
+mlruns/
+artifacts/
+mlops/mlruns
+mlops/results
+mlops/venv
+mlops/__pycache__
+mlartifacts/
+ml/__pycache__
+
+# ignore files
+*.pt
+*.csv
+*.pkl
