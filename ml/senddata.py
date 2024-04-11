@@ -10,7 +10,10 @@ folderpath_preprocessing = r"ml/trained_data/for_processing"
 
 # Checks so rows in CSV file doenst't overstep 5001, used to create evenly sized files
 def check_data_size():
-     for file_name in os.listdir("ml/trained_data/"):
+    contents = os.listdir("ml/trained_data/")
+    if len(contents) == 0:
+        raise Exception("Directory is empty!")
+    for file_name in os.listdir("ml/trained_data/"):
         if file_name.endswith(r'.csv'):
             df = pd.read_csv(f"ml/trained_data/{file_name}")
             num_rows = df.shape[0]
@@ -33,6 +36,13 @@ def data_preprocessing(participant):
     
 # send the data to a MLFLOW server
 def send_data_to_server(serveruri, experiment_name,participant):
+    
+    if os.path.exists(folderpath) == False:
+        os.makedirs(folderpath, exist_ok=True)
+        
+    if os.path.exists(folderpath_preprocessing) == False:
+        os.makedirs(folderpath_preprocessing, exist_ok=True)
+        
     check_data_size()
     data_preprocessing(participant)
     

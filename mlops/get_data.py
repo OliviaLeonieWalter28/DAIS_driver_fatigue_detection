@@ -4,13 +4,20 @@ import time
 from mlflow.tracking import MlflowClient
 import argparse
 import subprocess
+import os
 
 old_runs = []
 raw_data_path = 'mlops/train_data'
+mlflow_artifacts_path = "mlops/artifacts"
 senddata_tag = "ml/senddata.py"
 participant = 0
 def check_if_new_data(serveruri,experiment_name):
-
+            
+        if os.path.exists(raw_data_path) == False:
+            os.makedirs(raw_data_path, exist_ok=True)
+        if os.path.exists(mlflow_artifacts_path) == False:
+            os.makedirs(mlflow_artifacts_path, exist_ok=True)
+            
         # Set MLflow tracking URI
         mlflow.set_tracking_uri(serveruri)
         

@@ -78,6 +78,9 @@ def amount_of_csv_files():
 
 # Checks is file needs to be expaned or create a new file and saves it
 def savefile(filepath, data, device_id):
+    if os.path.exists(folderpath) == False:
+        os.makedirs(folderpath, exist_ok=True)
+        
     if exists(filepath):
         if create_new_file(f"ml/trained_data/{getLastCSVFile()}"):
             filepath = f"{get_filename(device_id)}({amount_of_csv_files()}).csv"
