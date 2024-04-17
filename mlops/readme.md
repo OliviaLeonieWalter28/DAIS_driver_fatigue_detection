@@ -7,19 +7,34 @@ export PYTHONPATH=$PYTHONPATH:$PWD
 python3 -m venv venv  # recommend using Python 3.10
 source venv/bin/activate  # on Windows: venv\Scripts\activate
 python3 -m pip install --upgrade pip setuptools wheel
-python3 -m pip install -r requirements.txt
-pre-commit install
-pre-commit autoupdate
+python3 -m pip install -r mlops/requirements.txt
 ```
 
 Once everything installed. Let's start to work (considering the code is run locally, look at the original github for anyscale support):
+# Pre-processing
+
+```
+# Data Pre-Processing - Download the preprocessed_dataset from Teams and put it in your linux /home/username/ folder
+change the LOC to where you have stored the preprocessed_dataset
+Change username in DATASET_LOC and OUTPUT_LOC to your ubuntu username
+```
+export DATASET_LOC="/home/username/preprocessed_dataset/preprocessed_dataset/train"
+export OUTPUT_LOC="/home/username/preprocessed_dataset/output"
+python ml/data_preprocessing.py --raw_data_path "$DATASET_LOC"  --dest_path  "$OUTPUT_LOC" --participant_test 5
+```
+
+
+
+
 
 # Training
+Change participant to the one you chose
 ```
 export EXPERIMENT_NAME="fatigue_with_CV"
 export DATASET_LOC="/Volumes/Elements/dais/data/uta_rldd/processed/"
 export TRAIN_LOOP_CONFIG='{"fc_size": 512, "lr": 1e-3, "lr_factor": 0.8, "lr_patience": 3}'
 python train.py \
+    --participant 5 \
     --experiment-name "$EXPERIMENT_NAME" \
     --dataset-loc "$DATASET_LOC" \
     --train-loop-config "$TRAIN_LOOP_CONFIG" \
@@ -33,12 +48,14 @@ python train.py \
 ```
 
 # Tuning 
+Change participant to the one you chose
 ```
 export EXPERIMENT_NAME="fatigue_with_CV"
 export DATASET_LOC="/Volumes/Elements/dais/data/uta_rldd/processed/"
 export TRAIN_LOOP_CONFIG='{"fc_size": 512, "lr": 1e-3, "lr_factor": 0.8, "lr_patience": 3}'
 export INITIAL_PARAMS="[{\"train_loop_config\": $TRAIN_LOOP_CONFIG}]"
 python tune.py \
+    --participant 5 \   
     --experiment-name "$EXPERIMENT_NAME" \
     --dataset-loc "$DATASET_LOC" \
     --initial-params "$INITIAL_PARAMS" \
@@ -55,34 +72,41 @@ python tune.py \
 Use the MLflow library to track our experiments and store our models and the MLflow Tracking UI to view our experiments. We have been saving our experiments to a local directory but note that in an actual production setting, we would have a central location to store all of our experiments. It's easy/inexpensive to spin up your own MLflow server for all of your team members to track their experiments on or use a managed solution like Weights & Biases, Comet, etc.
 
 ```
+export MODEL_REGISTRY=/tmp/mlflow
+mlflow server -h 0.0.0.0 -p 8080 --backend-store-uri $MODEL_REGISTRY
+```
+or try
+```
 export MODEL_REGISTRY=$(python -c "import config; print(config.MODEL_REGISTRY)")
 mlflow server -h 0.0.0.0 -p 8080 --backend-store-uri $MODEL_REGISTRY
 ```
+
 Then look at http://localhost:8080/ to view your MLflow dashboard.
 
-# Evaluation
+# Evaluation 
+Pre-step: go into you MLflow, look through all your runs and choose the one that has the best result,on the upper left side you will have the run id displayed, copy that.
+for run_id use the one you just copied, also change the participant number to the one you chose 
 ```
 export EXPERIMENT_NAME="fatigue_with_CV"
-export RUN_ID=$(python  mlops/predict.py get-best-run-id --experiment-name $EXPERIMENT_NAME --metric val_loss --mode ASC)
-export HOLDOUT_LOC="/Volumes/Elements/dais/data/uta_rldd/processed/"
+export HOLDOUT_LOC="/home/username/preprocessed_dataset/output"
 python mlops/evaluate.py \
     --run-id "$RUN_ID" \
     --dataset-loc "$HOLDOUT_LOC" \
-    --participant 23 \
+    --participant 5 \
     --subset "test" \
     --results-fp results/evaluation_results.json
 ```
 
 # Inference
+for run_id use the one you just copied, also change the participant number to the one you chose 
 ```
 # Get run ID
 export EXPERIMENT_NAME="fatigue_with_CV"
-export DATASET_LOC="/Volumes/Elements/dais/data/uta_rldd/processed/"
-export RUN_ID=$(python predict.py get-best-run-id --experiment-name $EXPERIMENT_NAME --metric val_loss --mode ASC)
+export DATASET_LOC="/home/username/preprocessed_dataset/output"
 python mlops/predict.py predict \
-    --run-id 5387bf137029472e95a3f447a6bd340d \
+    --run-id ea228a827c814bb7bf49d93ec6890c43  \
     --dataset-loc "$DATASET_LOC" \
-    --participant 23 \
+    --participant 5 \
     --subset "test" 
 ```
 
@@ -95,11 +119,24 @@ ray start --head
 
 Then launch the serve script:
 ```
-# Set up
+# Set up - for run_id enter use the one you just copied
 export EXPERIMENT_NAME="fatigue_with_CV"
-export RUN_ID=$(python mlops/predict.py get-best-run-id --experiment-name $EXPERIMENT_NAME --metric val_loss --mode ASC)
-python mlops/serve.py --run_id 5387bf137029472e95a3f447a6bd340d
+python mlops/serve.py --run_id ea228a827c814bb7bf49d93ec6890c43
 ```
+#####################
+# AUTOMATED VERSION #
+#####################
+
+# Data Pre-Processing - Download the preprocessed_dataset from Teams and put it in your linux /home/username/ folder
+change the LOC to where you have stored the preprocessed_dataset
+Change username in DATASET_LOC  to your ubuntu username
+```
+export DATASET_LOC="/home/oliviawalter/preprocessed_dataset/preprocessed_dataset/train"
+export OUTPUT_LOC="mlops/train_data/data"
+python ml/data_preprocessing.py --raw_data_path "$DATASET_LOC"  --dest_path  "$OUTPUT_LOC" --participant_test 5
+
+python3 mlops/run.py --participant 5
+
 
 On the client side, use python or curl. Here an example in python to request the service:
 ```
