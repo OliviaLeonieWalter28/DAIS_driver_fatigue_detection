@@ -265,7 +265,7 @@ if __name__ == '__main__':
     #     quit()
 
 
-    participant_test=23
+    participant_test=8
     print('loading the training set')
     X, y, g = load_pickle(os.path.join("/home/oliviawalter/preprocessed_dataset/output/train_participant"+str(participant_test)+".pkl"))
     print('loading the test set')
