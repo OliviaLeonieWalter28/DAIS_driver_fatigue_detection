@@ -5,8 +5,8 @@ import os
 import argparse
 import pandas as pd
 
-folderpath = r"ml/trained_data/processed"
-folderpath_preprocessing = r"ml/trained_data/for_processing"
+folderpath = r"ml2.0/trained_data/processed"
+folderpath_preprocessing = r"ml2.0/trained_data/for_processing"
 
 # Checks so rows in CSV file doenst't overstep 5001, used to create evenly sized files
 def check_data_size():
