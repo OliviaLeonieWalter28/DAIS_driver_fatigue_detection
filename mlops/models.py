@@ -27,6 +27,7 @@ class FatigueNet(nn.Module): # pragma: no cover, torch model
         self.fc2 = nn.Sequential(
             nn.Linear(in_features=fc_size, out_features=2)
         )
+        
 
     def forward(self, x):
         feats = x['features']

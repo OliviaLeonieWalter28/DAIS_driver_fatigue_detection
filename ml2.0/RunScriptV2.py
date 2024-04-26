@@ -195,7 +195,7 @@ def process_frame(frame):
         moe = calculate_moe(mar, ear)
 
         adjust_drowsiness_score(ear, mar, puc, moe)
-        print(drowsiness_score)
+        
         drowsy = True if drowsiness_score >= 10 else False
         savetocsv.createdata(drowsy,ear,mar,puc,moe,frame_count)
         # # Write data to CSV

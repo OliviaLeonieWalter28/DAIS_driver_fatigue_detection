@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import dlib
 import joblib
@@ -9,6 +10,7 @@ import sys
 import os
 import csv
 import time
+import savedata as savetocsv
 
 
 class DrowsinessNet(nn.Module):
@@ -194,12 +196,15 @@ def process_frame(frame):
         moe = calculate_moe(mar, ear)
 
         adjust_drowsiness_score(ear, mar, puc, moe)
+        
+        drowsy = True if drowsiness_score >= 10 else False
+        savetocsv.createdata(drowsy,ear,mar,puc,moe,frame_count)
 
         # Write data to CSV
-        drowsy = True if drowsiness_score >= 10 else False
-        data = {'Frame': frame_count, 'EAR': ear, 'MAR': mar, 'MOE': moe, 'Drowsy': drowsy,
-                'Left Eye': leftEAR, 'Right Eye': rightEAR, 'Mouth': mar}
-        write_to_csv(data)
+        # drowsy = True if drowsiness_score >= 10 else False
+        # data = {'Frame': frame_count, 'EAR': ear, 'MAR': mar, 'MOE': moe, 'Drowsy': drowsy,
+        #         'Left Eye': leftEAR, 'Right Eye': rightEAR, 'Mouth': mar}
+        # write_to_csv(data)
 
         for eye, ear_value, label in [(leftEye, leftEAR, '(L)'), (rightEye, rightEAR, '(R)')]:
             x1, y1 = np.min(eye, axis=0)
@@ -261,5 +266,10 @@ def process_video(video_file):
 
 # Main function
 if __name__ == "__main__":
-    video_file = r"/home/oliviawalter/video/test.mp4"  # Change this to the path of your video file
-    process_video(video_file)
+    
+    parser = argparse.ArgumentParser() 
+    parser.add_argument("--videopath", help="--")
+    
+    args = parser.parse_args()
+    # video_file = r"/home/oliviawalter/video/testvideo2.mkv"  # Change this to the path of your video file
+    process_video(args.videopath)

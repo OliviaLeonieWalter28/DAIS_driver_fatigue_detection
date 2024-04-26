@@ -488,7 +488,15 @@ def single_source(live=True, path=None, draw=True, window=2400, store_data=False
 
     cap.release()
 
-
+def rename_state_dict_keys(state_dict):
+    new_state_dict = {}
+    for key, value in state_dict.items():
+        if key.startswith("module."):
+            new_key = key.replace("module.", "")  # Remove the "module." prefix
+        else:
+            new_key = key
+        new_state_dict[new_key] = value
+    return new_state_dict
 
 def load_model():
     from cnn1d import data_loader, FatigueNet
@@ -496,8 +504,10 @@ def load_model():
     DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model = FatigueNet().to(DEVICE)
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
-    checkpoint = torch.load("./cnn1d_fatigue_epoch99.pt")
+    checkpoint = torch.load("./checkpoint_epoch_25.pt")
+    #state_dict = rename_state_dict_keys(checkpoint['model_state_dict'])
     model.load_state_dict(checkpoint['model_state_dict'])
+    # model.load_state_dict(state_dict, strict=False) # strict only for error: Missing key(s) in state_dict: "fc3.0.weight", "fc3.0.bias". 
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
