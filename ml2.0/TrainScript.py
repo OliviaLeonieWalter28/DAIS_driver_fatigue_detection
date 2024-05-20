@@ -55,9 +55,9 @@ class DrowsinessNet(nn.Module):
         x = F.relu(self.fc6(x))
         x = self.fc7(x)
         return x
-        
 
-folder_path = r'/home/oliviawalter/preprocessed_dataset/preprocessed_dataset/train/train/train_medium'
+
+folder_path = r'/home/ljungmar/preprocessed_dataset/preprocessed_dataset/train/train/train_medium'
 dfs = []
 for file_name in os.listdir(folder_path):
     if file_name.endswith('.csv'):
@@ -109,13 +109,13 @@ for epoch in range(200):
     model.train()
     for inputs, labels in train_loader:
         inputs, labels = inputs.to(device), labels.to(device)
-        
+
         optimizer.zero_grad()
-        
+
         with autocast():
             outputs = model(inputs)
             loss = criterion(outputs, labels)
-        
+
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()
@@ -170,6 +170,3 @@ plt.show()
 
 torch.save(model.state_dict(), 'best_model_02-05_large1.pth')
 joblib.dump(scaler, 'scaler_best_model_02-05_large1.pkl')
-
-
-

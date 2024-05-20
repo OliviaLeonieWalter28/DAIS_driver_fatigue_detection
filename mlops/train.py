@@ -135,10 +135,12 @@ def train_loop_per_worker(config: dict) -> None:  # pragma: no cover, tested via
         # Checkpoint
         metrics = dict(epoch=epoch, lr=optimizer.param_groups[0]["lr"], train_loss=train_loss, val_loss=val_loss)
         checkpoint = TorchCheckpoint.from_model(model=model)
-        
-        checkpoint_path = os.path.join("/home/oliviawalter/DAIS_driver_fatigue_detection/mlops/checkpoints", f"checkpoint_epoch_{epoch}.pt")
+
+        checkpoint_dir = "/home/ljungmar/DAIS_driver_fatigue_detection/mlops/checkpoints"
+        os.makedirs(checkpoint_dir, exist_ok=True) # Create a directory if it doesn't exist
+        checkpoint_path = os.path.join(checkpoint_dir, f"checkpoint_epoch_{epoch}.pt")
         torch.save(model.state_dict(), checkpoint_path)
-        
+
         session.report(metrics, checkpoint=checkpoint)
 
 
