@@ -109,11 +109,17 @@ def get_best_checkpoint(run_id: str) -> TorchCheckpoint:  # pragma: no cover, ml
     """
     # Downloads the artifacts first
     client = MlflowClient()
-    mlflow.tracking.MlflowClient().download_artifacts(run_id, '', 'mlops/artifacts')
-    
+
+    artifacts_dir = 'mlops/artifacts'
+
+    if not os.path.exists(artifacts_dir):
+        os.makedirs(artifacts_dir)
+
+    mlflow.tracking.MlflowClient().download_artifacts(run_id, '', artifacts_dir)
+
     # Used if stored locally
     # artifact_dir = urlparse(mlflow.get_run(run_id).info.artifact_uri).path  # get path from mlflow
-    results = Result.from_path('mlops/artifacts')
+    results = Result.from_path(artifacts_dir)
     return results.best_checkpoints[0][0]
 
 

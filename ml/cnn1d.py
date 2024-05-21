@@ -47,7 +47,7 @@ class EarlyStopper:
 for epoch in np.arange(n_epochs):
     train_loss = train_one_epoch(model, train_loader)
     validation_loss = validate_one_epoch(model, validation_loader)
-    if early_stopper.early_stop(validation_loss):             
+    if early_stopper.early_stop(validation_loss):
         break
     '''
 
@@ -267,9 +267,9 @@ if __name__ == '__main__':
 
     participant_test=8
     print('loading the training set')
-    X, y, g = load_pickle(os.path.join("/home/oliviawalter/preprocessed_dataset/output/train_participant"+str(participant_test)+".pkl"))
+    X, y, g = load_pickle(os.path.join("/home/ljungmar/preprocessed_dataset/output/train_participant"+str(participant_test)+".pkl"))
     print('loading the test set')
-    Xt, yt, gt = load_pickle(os.path.join("/home/oliviawalter/preprocessed_dataset/output/test_participant"+str(participant_test)+".pkl"))
+    Xt, yt, gt = load_pickle(os.path.join("/home/ljungmar/preprocessed_dataset/output/test_participant"+str(participant_test)+".pkl"))
 
     print('trainingset:',Xt.shape,' participants:', len(np.unique(g)))
     from sklearn.model_selection import GroupShuffleSplit

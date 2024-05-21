@@ -1,7 +1,12 @@
 import argparse
 from http import HTTPStatus
+import json
+import pickle
+from fastapi.responses import JSONResponse
+import requests
 from typing import Dict
 
+from flask import jsonify
 import pandas as pd
 import ray
 from fastapi import FastAPI
@@ -11,6 +16,9 @@ from starlette.requests import Request
 import numpy as np
 import evaluate, predict
 from config import MLFLOW_TRACKING_URI, mlflow
+
+from typing import List
+
 
 # Define application
 app = FastAPI(
@@ -74,7 +82,6 @@ class ModelDeployment:
                 results[i]["prediction"] = "undetermined"
 
         return {"results": results}
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
